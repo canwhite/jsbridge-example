@@ -9,6 +9,9 @@
 
 @interface AppDelegate ()
 
+@property(nonatomic,strong) ViewController * viewController;
+
+
 @end
 
 @implementation AppDelegate
@@ -16,6 +19,24 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    
+    /*
+        为了去掉main.sb ,做了两个操作，
+        1.删除了plist里的main sb项目
+        2.在此处设置了window和对应控制器
+     */
+
+    //初始化控制器
+    self.viewController = [[ViewController alloc]init];
+    //初始化window
+    self.window = [[UIWindow alloc]initWithFrame:[UIScreen mainScreen].bounds];
+    //设置rootViewController
+    self.window.rootViewController = self.viewController;
+    //给窗口添加背景色
+    self.window.backgroundColor = [UIColor whiteColor];
+    //因为只有一个主窗口，这是个快捷方式，让被使用对象的主窗口显示在最前端
+    [self.window makeKeyAndVisible];
+    
     return YES;
 }
 

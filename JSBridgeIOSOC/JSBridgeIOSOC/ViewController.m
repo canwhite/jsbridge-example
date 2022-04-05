@@ -55,7 +55,7 @@
     [self setWebConfig];
     
     // 初始化 WKWebView
-    [self initWebView];
+    [self initView];
     
     // 注册与 H5 交互的事件函数
     [self registerHandlers];
@@ -95,11 +95,14 @@
 /**
  * 初始化 WKWebView
  */
-- (void)initWebView {
+- (void)initView {
+    
+    
+    // webview
     // URL 网络请求地址
     // TODO: 请替换成页面的 url 地址
-    NSString *URLSTR = @"http://xxx.xxx.xxx.xx:xxxx";
-    self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 360) configuration:_webConfig];
+    NSString *URLSTR = @"http://localhost:8000";
+    self.webView = [[WKWebView alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, 380) configuration:_webConfig];
     // 设置 UserAgent 后缀
     _webView.customUserAgent = [NSString stringWithFormat:self.webView.customUserAgent, @"app"];
     _webView.UIDelegate = self;
@@ -108,10 +111,62 @@
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url];
     [_webView loadRequest:urlRequest];
     [self.view addSubview:_webView];
+
+
+    //changeName
+    self.nameText = [[UITextField alloc]init];
+    //设置文本输入框的位置
+    self.nameText.frame = CGRectMake(10, 390, 180, 30);
+    //初始化是一个空字符串
+    self.nameText.text = @"";
+    self.nameText.placeholder = @"changeName";
+    self.nameText.keyboardType = UIKeyboardTypeDefault;
+    [self.view addSubview:self.nameText];
+    
+    
+    //changeName btn
+    UIButton * nameBtn = [[UIButton alloc]initWithFrame:CGRectMake(190, 390, 120, 30)];
+    [self.view addSubview:nameBtn];
+    [nameBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+    [nameBtn setBackgroundColor:[UIColor blueColor]];
+    [nameBtn setTitle:@"changeName" forState:UIControlStateNormal];
+    [nameBtn addTarget:self action:@selector(changeNameClick:) forControlEvents:UIControlEventTouchUpInside];
+    
+
+    //cookieText
+    self.cookieText = [[UITextField alloc]init];
+    //设置文本输入框的位置
+    self.cookieText.frame = CGRectMake(10, 430, 180, 30);
+    self.cookieText.text = @"";
+    self.cookieText.placeholder = @"changeCookie";
+    self.cookieText.keyboardType = UIKeyboardTypeDefault;
+    [self.view addSubview:self.cookieText];
+    
+    
+    //cookieBtn
+    UIButton * cookieBtn = [[UIButton alloc]initWithFrame:CGRectMake(190, 430, 120, 30)];
+    [self.view addSubview:cookieBtn];
+    [cookieBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateSelected];
+    [cookieBtn setBackgroundColor:[UIColor blueColor]];
+    [cookieBtn setTitle:@"changeName" forState:UIControlStateNormal];
+    [cookieBtn addTarget:self action:@selector(changeCookieClick:) forControlEvents:UIControlEventTouchUpInside];
+    
+    
+    //user名称的显示
+    UILabel * label = [[UILabel alloc]init];
+    label.frame = CGRectMake(10, 470, 120, 30);
+    label.text = @"user:";
+    [self.view addSubview:label];
+    
+    self.userLabel = [[UILabel alloc]init];
+    self.userLabel.frame = CGRectMake(130, 470, 180, 30);
+    [self.view addSubview:self.userLabel];
+    
+
 }
 
 /**
- * 使用 WebViewJavascriptBridge 注册与 H5 交互的事件函数
+ * 注册事件，h5调用
  */
 - (void)registerHandlers {
     // 启用 WebViewJavascriptBridge
@@ -137,35 +192,40 @@
     }];
 }
 
+
+
 /**
- * 修改 name 按钮被点击时触发
+ 原生调用h5方法，大头就在调用部分
  */
-- (IBAction)onChangeNameBtnClick:(UIButton *)sender forEvent:(UIEvent *)event {
+
+-(void)changeNameClick:(UIButton *)btn{
+    // 按到
     NSString *name = [self.nameText text];
     // 调用 H5 界面的 changeName 事件函数
     [self.bridge callHandler:@"changeName" data:name responseCallback:^(id responseData) {
         [ViewController addToastWithString:@"name 修改成功" inView:self.view];
+        //传完之后重新置空
         [self.nameText setText:@""];
     }];
 }
 
-/**
- * 设置 Cookie 按钮被点击时触发
- */
-- (IBAction)onCookieBtnClick:(UIButton *)sender forEvent:(UIEvent *)event {
+
+-(void)changeCookieClick:(UIButton *)btn{
     NSString *cookie = [NSString stringWithFormat:@"token=%@", [self.cookieText text]];
     [self syncCookie:cookie];
-    // 调用 H5 界面的 syncCookie 事件函数
+    // 调用 H5 界面的 syncCookie 事件函数，这里该方法并没有传数值，只是起到一个唤起作用
     [self.bridge callHandler:@"syncCookie" data:@"" responseCallback:^(id responseData) {
         [ViewController addToastWithString:@"Cookie 同步成功" inView:self.view];
         [self.cookieText setText:@""];
     }];
 }
 
+
 /**
  * 用来t设置并同步 Cookie 的工具函数
  */
 - (void) syncCookie: (NSString *)cookie {
+    // cookie值的交换比较特殊，这里是通过往document上挂载cookie，然后前端通过js-cookie获取的
     // 使用 WKUserScript 携带 cookie 参数传递到 js 页面
     NSString *cookieValue = [NSString stringWithFormat:@"document.cookie = '%@%@", cookie, @"';"];
     [_webView evaluateJavaScript:cookieValue completionHandler:^(id _Nullable result, NSError * _Nullable error) {

@@ -16,8 +16,13 @@ export default (props) => {
     const [name, setName] = useState();
     const [token, setToken] = useState(Cookie.get('token'));
 
+    /*
+    H5注册原生调用的方法
+    */
+
     window.setupWebViewJavascriptBridge(bridge => {
         bridge.registerHandler("changeName", (data, fn) => {
+            console.log("--name--",data);
             setName(data);
             fn && fn("");
         });
@@ -39,6 +44,8 @@ export default (props) => {
         })
     };
     
+
+
     /**
      * 调用原生方法刷新 H5 界面
      */
@@ -68,7 +75,7 @@ export default (props) => {
             <Button style={{ marginBottom: 30 }} type="primary" onClick={ handleReload }>调用原生方法刷新 H5 界面</Button>
             <br />
             <Button type="primary" onClick={ handleChangeUser }>修改原生界面的 user 值</Button>
-            <Input value={ user } onChange={ (e) => setUser(e.target.value) } style={{ marginLeft: 10, width: 160 }} placeholder="请输入新的 user 名称" />
+            <Input value={ user } onChange={ (e) => setUser(e.target.value) } style={{marginTop:30, marginLeft: 10, width: 160 }} placeholder="请输入新的 user 名称" />
             <div style={{ marginTop: 30, fontSize: 16 }}>
                 <label>Name 值：</label><span style={{ marginLeft: 40 }}>{ name }</span>
             </div>

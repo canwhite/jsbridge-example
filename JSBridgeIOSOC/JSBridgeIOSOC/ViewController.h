@@ -16,16 +16,18 @@
 @property WebViewJavascriptBridge *bridge;
 @property WKWebViewConfiguration *webConfig;
 
-@property (strong, nonatomic) IBOutlet UITextField *nameText;
-@property (strong, nonatomic) IBOutlet UITextField *cookieText;
-@property (strong, nonatomic) IBOutlet UILabel *userLabel;
+
+//几个输入框，当然对应有改变值的button
+@property(strong,nonatomic) UITextField * nameText;
+@property(strong,nonatomic) UITextField * cookieText;
+@property(strong,nonatomic) UILabel * userLabel;
+
+
 
 - (void)setWebConfig;
-- (void)initWebView;
+- (void)initView;
 - (void)registerHandlers;
 
-- (IBAction)onChangeNameBtnClick:(UIButton *)sender forEvent:(UIEvent *)event;
-- (IBAction)onCookieBtnClick:(UIButton *)sender forEvent:(UIEvent *)event;
 
 - (void)syncCookie:(NSString *)cookie;
 + (BOOL)judgeIsEmptyWithString:(NSString *)string;

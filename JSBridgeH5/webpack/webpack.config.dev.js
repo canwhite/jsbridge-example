@@ -22,6 +22,7 @@ const config = merge(common, {
         // 是否在浏览器蒙层展示错误信息
         overlay: true,
         inline: true,
+
         // 展示的统计信息
         stats: 'errors-only',
         // 配置代理

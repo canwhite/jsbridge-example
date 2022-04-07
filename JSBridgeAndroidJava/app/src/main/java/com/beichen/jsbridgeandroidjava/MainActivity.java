@@ -23,8 +23,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private BridgeWebView mWebView;
     // URL 网络请求地址
-    // TODO: 请替换成页面的 url 地址
-    private static final String URL = "http://xxx.xxx.xxx.xxx:xxxx/";
+    // 注意不要用localhost，这样容易被android认为是它自己，要在网络偏好设置里边看局域网地址
+    private static final String URL = "http://192.168.21.68:8000";
+
 
     long exitTime = 0;
     private TextView mTvUser;
@@ -35,12 +36,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //按照这个顺序来吧
         initWebView();
-
-        registerHandlers();
-
         initViews();
+        registerHandlers();
 
     }
 
@@ -49,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         mWebView.reload();
     }
+
 
     /**
      * 初始化 WebView
@@ -72,7 +72,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mWebView.setWebChromeClient(new WebChromeClient());
         mWebView.setWebViewClient(new MyWebViewClient(mWebView));
 
+        //最最重要的挂载url
         mWebView.loadUrl(URL);
+    }
+
+    /**
+     * 初始化其他 View 组件
+     */
+    private void initViews() {
+        //点击监听，
+        findViewById(R.id.btn_cookie).setOnClickListener(this);
+        findViewById(R.id.btn_name).setOnClickListener(this);
+        findViewById(R.id.btn_init).setOnClickListener(this);
+
+        //找到这些元素
+        mTvUser = findViewById(R.id.tv_user);
+        mEditCookie = findViewById(R.id.edit_cookie);
+        mEditName = findViewById(R.id.edit_name);
+
+        //点击监听
+//        mTvUser.setOnClickListener(this);
+//        mEditCookie.setOnClickListener(this);
+//        mEditName.setOnClickListener(this);
+
+
     }
 
     /**
@@ -110,17 +133,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    /**
-     * 初始化其他 View 组件
-     */
-    private void initViews() {
-        findViewById(R.id.btn_cookie).setOnClickListener(this);
-        findViewById(R.id.btn_name).setOnClickListener(this);
-        findViewById(R.id.btn_init).setOnClickListener(this);
-        mTvUser = findViewById(R.id.tv_user);
-        mEditCookie = findViewById(R.id.edit_cookie);
-        mEditName = findViewById(R.id.edit_name);
-    }
+
 
     @Override
     public void onClick(View v) {
@@ -139,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mWebView.callHandler("changeName", mEditName.getText().toString(), new CallBackFunction() {
                     @Override
                     public void onCallBack(String data) {
+
                         Toast.makeText(MainActivity.this, "name 修改成功", Toast.LENGTH_SHORT).show();
                         mEditName.setText("");
                     }
